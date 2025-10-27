@@ -1,0 +1,28 @@
+services:
+  postgres:
+    container_name: lab2.postgres
+    image: postgres
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data_lab2:/var/lib/postgresql
+    networks:
+      - db-network
+
+  pgadmin:
+    container_name: lab2.pgadmin
+    image: dpage/pgadmin4
+    env_file:
+      - .env
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
+    networks:
+      - db-network
+
+networks:
+  db-network:
+    driver: bridge
