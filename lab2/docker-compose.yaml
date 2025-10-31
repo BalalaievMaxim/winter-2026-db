@@ -4,10 +4,13 @@ services:
     image: postgres
     env_file:
       - .env
+    environment:
+      - POSTGRES_DB=gym_management
     ports:
       - "5432:5432"
     volumes:
       - ./data_lab2:/var/lib/postgresql
+      - ./init-scripts:/docker-entrypoint-initdb.d
     networks:
       - db-network
 

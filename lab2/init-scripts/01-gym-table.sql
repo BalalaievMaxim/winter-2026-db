@@ -3,6 +3,9 @@
 -- Система управління фітнес-залом
 -- ============================================
 
+-- Підключитись до створеної бази gym_management
+\c gym_management;
+
 -- Видалення таблиць, якщо вони існують (для повторного запуску)
 DROP TABLE IF EXISTS Enrollment CASCADE;
 DROP TABLE IF EXISTS Class CASCADE;
