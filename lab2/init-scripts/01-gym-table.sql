@@ -1,12 +1,5 @@
-﻿-- ============================================
--- Lab 2: Gym Management System Database Schema
--- Система управління фітнес-залом
--- ============================================
+﻿\c gym_management;
 
--- Підключитись до створеної бази gym_management
-\c gym_management;
-
--- Видалення таблиць, якщо вони існують (для повторного запуску)
 DROP TABLE IF EXISTS Enrollment CASCADE;
 DROP TABLE IF EXISTS Class CASCADE;
 DROP TABLE IF EXISTS Invoice CASCADE;
@@ -16,11 +9,6 @@ DROP TABLE IF EXISTS Coach CASCADE;
 DROP TABLE IF EXISTS ClassType CASCADE;
 DROP TABLE IF EXISTS MembershipPlan CASCADE;
 
--- ============================================
--- Створення таблиць
--- ============================================
-
--- Таблиця: План членства (Абонемент)
 CREATE TABLE MembershipPlan (
     plan_id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
@@ -30,7 +18,6 @@ CREATE TABLE MembershipPlan (
     CONSTRAINT check_access_type CHECK (access IN ('gym_only', 'gym_pool', 'gym_cardio', 'all_inclusive'))
 );
 
--- Таблиця: Клієнт
 CREATE TABLE Client (
     client_id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -41,7 +28,6 @@ CREATE TABLE Client (
     CONSTRAINT check_email_format CHECK (email LIKE '%@%')
 );
 
--- Таблиця: Членство (активний абонемент клієнта)
 CREATE TABLE Membership (
     membership_id SERIAL PRIMARY KEY,
     client_id INTEGER NOT NULL,
@@ -55,7 +41,6 @@ CREATE TABLE Membership (
     CONSTRAINT check_dates CHECK (end_date > start_date)
 );
 
--- Таблиця: Рахунок-фактура
 CREATE TABLE Invoice (
     invoice_id SERIAL PRIMARY KEY,
     client_id INTEGER NOT NULL,
@@ -69,7 +54,6 @@ CREATE TABLE Invoice (
     CONSTRAINT check_payment_method CHECK (payment_method IN ('cash', 'card', 'bank_transfer', 'online'))
 );
 
--- Таблиця: Тренер
 CREATE TABLE Coach (
     coach_id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -80,14 +64,12 @@ CREATE TABLE Coach (
     CONSTRAINT check_coach_email CHECK (email LIKE '%@%')
 );
 
--- Таблиця: Тип заняття
 CREATE TABLE ClassType (
     class_type_id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
     description TEXT
 );
 
--- Таблиця: Заняття
 CREATE TABLE Class (
     class_id SERIAL PRIMARY KEY,
     class_type_id INTEGER NOT NULL,
@@ -102,7 +84,6 @@ CREATE TABLE Class (
     CONSTRAINT check_capacity_limit CHECK (current_enrollment <= capacity)
 );
 
--- Таблиця: Запис на заняття
 CREATE TABLE Enrollment (
     enrollment_id SERIAL PRIMARY KEY,
     client_id INTEGER NOT NULL,
@@ -113,18 +94,12 @@ CREATE TABLE Enrollment (
     UNIQUE(client_id, class_id)
 );
 
--- ============================================
--- Вставка тестових даних
--- ============================================
-
--- Плани членства (4 записи)
 INSERT INTO MembershipPlan (name, access, duration_months, price) VALUES
     ('Basic Gym', 'gym_only', 1, 500.00),
     ('Gym + Pool', 'gym_pool', 3, 1350.00),
     ('Premium Cardio', 'gym_cardio', 6, 2400.00),
     ('VIP All Inclusive', 'all_inclusive', 12, 5400.00);
 
--- Клієнти (5 записів)
 INSERT INTO Client (name, email, password, phone) VALUES
     ('Олександр Петренко', 'oleksandr.p@gmail.com', 'hashed_pass_1', '+380501234567'),
     ('Марія Коваленко', 'maria.k@gmail.com', 'hashed_pass_2', '+380502345678'),
@@ -132,7 +107,6 @@ INSERT INTO Client (name, email, password, phone) VALUES
     ('Анна Бойко', 'anna.b@gmail.com', 'hashed_pass_4', '+380504567890'),
     ('Дмитро Мельник', 'dmytro.m@gmail.com', 'hashed_pass_5', '+380505678901');
 
--- Членства (5 записів - активні абонементи клієнтів)
 INSERT INTO Membership (client_id, plan_id, start_date, end_date, price, is_active) VALUES
     (1, 1, '2024-10-01', '2024-11-01', 500.00, TRUE),
     (2, 3, '2024-09-15', '2025-03-15', 2400.00, TRUE),
@@ -140,7 +114,6 @@ INSERT INTO Membership (client_id, plan_id, start_date, end_date, price, is_acti
     (4, 4, '2024-08-01', '2025-08-01', 5400.00, TRUE),
     (5, 1, '2024-10-20', '2024-11-20', 500.00, TRUE);
 
--- Рахунки-фактури (5 записів)
 INSERT INTO Invoice (client_id, amount, date, status, payment_method, notes) VALUES
     (1, 500.00, '2024-10-01', 'paid', 'card', 'Basic membership payment'),
     (2, 2400.00, '2024-09-15', 'paid', 'bank_transfer', 'Premium 6-month membership'),
@@ -148,14 +121,12 @@ INSERT INTO Invoice (client_id, amount, date, status, payment_method, notes) VAL
     (4, 5400.00, '2024-08-01', 'paid', 'card', 'VIP yearly membership'),
     (5, 500.00, '2024-10-20', 'pending', 'online', 'Awaiting payment confirmation');
 
--- Тренери (4 записи)
 INSERT INTO Coach (name, specialization, email, password) VALUES
     ('Андрій Коваль', 'Yoga & Pilates', 'andriy.koval@gym.com', 'coach_pass_1'),
     ('Оксана Литвин', 'Cardio & Fitness', 'oksana.l@gym.com', 'coach_pass_2'),
     ('Сергій Бондар', 'Boxing & Martial Arts', 'sergiy.b@gym.com', 'coach_pass_3'),
     ('Наталія Савченко', 'Swimming & Aqua Aerobics', 'natalia.s@gym.com', 'coach_pass_4');
 
--- Типи занять (5 записів)
 INSERT INTO ClassType (name, description) VALUES
     ('Yoga', 'Relaxing yoga session for flexibility and mindfulness'),
     ('Boxing', 'High-intensity boxing training for strength and endurance'),
@@ -163,7 +134,6 @@ INSERT INTO ClassType (name, description) VALUES
     ('Swimming', 'Professional swimming lessons and techniques'),
     ('HIIT', 'High-Intensity Interval Training for maximum calorie burn');
 
--- Заняття (8 записів)
 INSERT INTO Class (class_type_id, coach_id, start_time, end_time, capacity, current_enrollment) VALUES
     (1, 1, '2024-11-01 09:00:00', '2024-11-01 10:00:00', 10, 3),
     (2, 3, '2024-11-01 10:30:00', '2024-11-01 11:30:00', 8, 2),
@@ -174,24 +144,19 @@ INSERT INTO Class (class_type_id, coach_id, start_time, end_time, capacity, curr
     (2, 3, '2024-11-03 16:00:00', '2024-11-03 17:00:00', 8, 1),
     (3, 2, '2024-11-04 17:00:00', '2024-11-04 18:00:00', 10, 2);
 
--- Записи на заняття (10 записів)
 INSERT INTO Enrollment (client_id, class_id) VALUES
-    (1, 1), -- Олександр на Yoga
-    (2, 1), -- Марія на Yoga
-    (3, 1), -- Іван на Yoga
-    (2, 2), -- Марія на Boxing
-    (4, 2), -- Анна на Boxing
-    (1, 3), -- Олександр на Cardio Dance
-    (2, 3), -- Марія на Cardio Dance
-    (3, 3), -- Іван на Cardio Dance
-    (5, 3), -- Дмитро на Cardio Dance
-    (4, 4); -- Анна на Swimming
+    (1, 1), 
+    (2, 1),
+    (3, 1),
+    (2, 2),
+    (4, 2),
+    (1, 3),
+    (2, 3),
+    (3, 3),
+    (5, 3),
+    (4, 4);
 
--- ============================================
--- Перевірка даних
--- ============================================
 
--- Підрахунок записів у кожній таблиці
 SELECT 'MembershipPlan' as table_name, COUNT(*) as row_count FROM MembershipPlan
 UNION ALL
 SELECT 'Client', COUNT(*) FROM Client
