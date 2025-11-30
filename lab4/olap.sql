@@ -42,13 +42,13 @@ GROUP BY payment_method;
 SELECT coach_id, COUNT(*) AS classes_count
 FROM Class
 GROUP BY coach_id
-HAVING COUNT(*) > 5;
+HAVING COUNT(*) > 3;
 
 -- 3.2. Знайти типи абонементів (plan_id), які купили більше 100 разів
 SELECT plan_id, COUNT(*) AS sales_count
 FROM Membership
 GROUP BY plan_id
-HAVING COUNT(*) > 100;
+HAVING COUNT(*) > 2;
 
 
 -- 4. JOINs
@@ -87,6 +87,14 @@ FROM ClassType ct
 JOIN Class cl ON ct.class_type_id = cl.class_type_id
 JOIN Enrollment e ON cl.class_id = e.class_id
 GROUP BY ct.name;
+
+--4.5 FULL JOIN: Створити список усіх клієнтів та всіх абонементів, показуючи, як вони співвідносяться
+SELECT
+    c.name AS client_name,
+    m.membership_id,
+    m.start_date
+FROM Client c
+FULL JOIN Membership m ON c.client_id = m.client_id;
 
 
 -- 5. ПІДЗАПИТИ
