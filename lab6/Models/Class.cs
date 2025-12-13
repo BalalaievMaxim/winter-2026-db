@@ -17,8 +17,6 @@ public partial class Class
 
     public int Capacity { get; set; }
 
-    public int? CurrentEnrollment { get; set; }
-
     public virtual Classtype ClassType { get; set; } = null!;
 
     public virtual Coach Coach { get; set; } = null!;
